@@ -17,14 +17,25 @@ mkdir -p "$OUTPUT_DIR"
 # 패키지 디렉토리로 이동
 cd "$OPENCODE_PKG_DIR"
 
+# package.json에서 version 읽기
+OPENCODE_VERSION=$(python3 - <<'PY'
+import json
+from pathlib import Path
+pkg = Path('package.json')
+print(json.loads(pkg.read_text())['version'])
+PY
+)
+
+echo "Using OPENCODE_VERSION from package.json: $OPENCODE_VERSION"
+
 # 의존성 설치
 echo "Installing dependencies..."
 bun install
 
 # 빌드 실행
 echo "Running build script (this may take a while as it builds for multiple targets)..."
-# bun run script/build.ts는 packages/opencode/package.json의 "build" 스크립트와 동일
-bun run build
+# bun run script/build.ts는 packages/opencode/package.json의 \"build\" 스크립트와 동일
+OPENCODE_VERSION="$OPENCODE_VERSION" bun run build
 
 # 결과물 복사
 echo "Copying binaries to dist..."
