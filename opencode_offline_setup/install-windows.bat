@@ -9,6 +9,7 @@ set "SCRIPT_DIR=%~dp0"
 set "SOURCE_BIN=%SCRIPT_DIR%dist\opencode-windows-x64.exe"
 :: WindowsApps 폴더는 기본적으로 PATH에 등록되어 있으므로 이곳에 설치합니다.
 set "TARGET_DIR=%LOCALAPPDATA%\Microsoft\WindowsApps"
+set "CONFIG_DEST=%USERPROFILE%\.config\opencode"
 
 :: --clean 인자가 넘어오면 설치된 파일을 삭제하고 종료합니다.
 if "%~1"=="--clean" (
@@ -25,7 +26,6 @@ if "%~1"=="--clean" (
     )
 
     :: 설정 폴더 삭제
-    set "CONFIG_DEST=%USERPROFILE%\.config\opencode"
     if exist "%CONFIG_DEST%" (
         rmdir /S /Q "%CONFIG_DEST%"
         echo [SUCCESS] Removed configuration folder: %CONFIG_DEST%
@@ -59,7 +59,6 @@ echo (WindowsApps directory is already in PATH by default.)
 echo.
 echo Copying configuration files...
 set "CONFIG_SOURCE=%SCRIPT_DIR%.config\opencode"
-set "CONFIG_DEST=%USERPROFILE%\.config\opencode"
 
 if exist "%CONFIG_SOURCE%" (
     if not exist "%CONFIG_DEST%" mkdir "%CONFIG_DEST%"

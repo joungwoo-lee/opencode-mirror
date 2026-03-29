@@ -35,7 +35,8 @@ if [ "$1" == "--clean" ]; then
     # 설정 폴더 삭제
     if [ -d "$CONFIG_DEST_DIR" ]; then
         echo "Removing configuration folder: $CONFIG_DEST_DIR"
-        rm -rf "$CONFIG_DEST_DIR"
+        [ -w "$CONFIG_DEST_DIR" ] || SUDO="sudo"
+        $SUDO rm -rf "$CONFIG_DEST_DIR"
         echo "[SUCCESS] Removed configuration folder"
     else
         echo "[INFO] Configuration folder not found: $CONFIG_DEST_DIR"
