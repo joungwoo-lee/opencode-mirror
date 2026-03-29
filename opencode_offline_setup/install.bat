@@ -6,7 +6,7 @@ echo Installing Opencode for Windows...
 echo ===========================================
 
 set "SCRIPT_DIR=%~dp0"
-set "SOURCE_BIN=%SCRIPT_DIR%opencode-windows-x64.exe"
+set "SOURCE_BIN=%SCRIPT_DIR%dist\opencode-windows-x64.exe"
 :: WindowsApps 폴더는 기본적으로 PATH에 등록되어 있으므로 이곳에 설치합니다.
 set "TARGET_DIR=%LOCALAPPDATA%\Microsoft\WindowsApps"
 

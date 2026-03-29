@@ -9,7 +9,7 @@ set -e
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="opencode"
-SOURCE_BINARY="$SCRIPT_DIR/opencode-linux-x64"
+SOURCE_BINARY="$SCRIPT_DIR/dist/opencode-linux-x64"
 
 # 실제 사용자 정보 추출 (sudo 실행 시에도 원래 사용자의 홈 디렉토리를 찾기 위함)
 REAL_USER=${SUDO_USER:-$USER}
