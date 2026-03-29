@@ -28,11 +28,14 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/preserved/.github/workflows
           
-          # 보존 대상 리스트 (opencode_offline_setup 폴더 및 싱크 워크플로우 자기 자신)
+          # 보존 대상 리스트 (opencode_offline_setup 폴더 및 커스텀 워크플로우들)
           if [ -d opencode_offline_setup ]; then
             cp -a opencode_offline_setup /tmp/preserved/
           fi
           cp -a .github/workflows/sync-upstream.yml /tmp/preserved/.github/workflows/
+          if [ -f .github/workflows/opencode-mirror-build.yml ]; then
+            cp -a .github/workflows/opencode-mirror-build.yml /tmp/preserved/.github/workflows/
+          fi
 
       - name: Sync from anomalyco/opencode
         run: |
@@ -52,10 +55,13 @@ jobs:
         run: |
           set -euo pipefail
           
-          # 1. 워크플로우 폴더 정리 후 싱크 워크플로우 복원
+          # 1. 워크플로우 폴더 정리 후 커스텀 워크플로우 복원
           rm -rf .github/workflows
           mkdir -p .github/workflows
           cp -a /tmp/preserved/.github/workflows/sync-upstream.yml .github/workflows/
+          if [ -f /tmp/preserved/.github/workflows/opencode-mirror-build.yml ]; then
+            cp -a /tmp/preserved/.github/workflows/opencode-mirror-build.yml .github/workflows/
+          fi
           
           # 2. opencode_offline_setup 폴더 복원 (기존 것을 덮어쓰거나 새로 생성)
           if [ -d /tmp/preserved/opencode_offline_setup ]; then
