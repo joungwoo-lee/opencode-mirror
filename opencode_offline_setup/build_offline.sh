@@ -50,10 +50,10 @@ fi
 
 # Windows x64
 if [ -f "dist/opencode-windows-x64/bin/opencode.exe" ]; then
-    cp "dist/opencode-windows-x64/bin/opencode.exe" "$OUTPUT_DIR/opencode-windows-x64.exe"
-    echo "Copied Windows x64 binary."
+    cp "dist/opencode-windows-x64/bin/opencode.exe" "$OUTPUT_DIR/opencode.exe"
+    echo "Copied Windows x64 binary as opencode.exe."
 else
-    echo "Warning: Windows x64 binary not found in dist/opencode-windows-x64/bin/opencode"
+    echo "Warning: Windows x64 binary not found in dist/opencode-windows-x64/bin/opencode.exe"
 fi
 
 echo "---------------------------------------------------"

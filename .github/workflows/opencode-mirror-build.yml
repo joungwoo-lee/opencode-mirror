@@ -40,24 +40,24 @@ jobs:
       - name: Run offline build
         run: ./opencode_offline_setup/build_offline.sh
 
-      - name: Prepare archive metadata
+      - name: Prepare release metadata
         id: meta
         run: |
           set -euo pipefail
           BUILD_DATE="$(date -u +'%Y%m%d')"
           BUILD_TS="$(date -u +'%Y%m%d-%H%M%S')"
-          ARCHIVE_NAME="opencode_offline_setup.zip"
+          ASSET_NAME="opencode.exe"
           TAG_NAME="opencode-mirror-build"
           RELEASE_NAME="opencode mirror build ${BUILD_TS}"
           echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
-          echo "archive_name=${ARCHIVE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "asset_name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
           echo "release_name=${RELEASE_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Archive opencode_offline_setup folder
+      - name: Verify release asset
         run: |
           set -euo pipefail
-          zip -r "${{ steps.meta.outputs.archive_name }}" opencode_offline_setup
+          test -f "opencode_offline_setup/dist/${{ steps.meta.outputs.asset_name }}"
 
       - name: Create GitHub release and upload asset
         uses: softprops/action-gh-release@v2
@@ -66,4 +66,4 @@ jobs:
           name: ${{ steps.meta.outputs.release_name }}
           generate_release_notes: true
           overwrite_files: true
-          files: ${{ steps.meta.outputs.archive_name }}
+          files: opencode_offline_setup/dist/${{ steps.meta.outputs.asset_name }}
