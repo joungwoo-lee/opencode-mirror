@@ -47,7 +47,7 @@ jobs:
           BUILD_DATE="$(date -u +'%Y%m%d')"
           BUILD_TS="$(date -u +'%Y%m%d-%H%M%S')"
           ARCHIVE_NAME="opencode_offline_setup-${BUILD_TS}.zip"
-          TAG_NAME="opencode-mirror-build-${BUILD_TS}"
+          TAG_NAME="opencode-mirror-build"
           RELEASE_NAME="opencode mirror build ${BUILD_TS}"
           echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
           echo "archive_name=${ARCHIVE_NAME}" >> "$GITHUB_OUTPUT"
