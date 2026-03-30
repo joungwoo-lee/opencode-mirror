@@ -47,7 +47,7 @@ jobs:
           BUILD_DATE="$(date -u +'%Y%m%d')"
           BUILD_TS="$(date -u +'%Y%m%d-%H%M%S')"
           ASSET_NAME="opencode.exe"
-          TAG_NAME="opencode-mirror-build"
+          TAG_NAME="latest"
           RELEASE_NAME="opencode mirror build ${BUILD_TS}"
           echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
           echo "asset_name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
