@@ -6,6 +6,9 @@ import { ModelsDev } from "../../provider/models"
 import { cmd } from "./cmd"
 import { UI } from "../ui"
 import { EOL } from "os"
+import { Filesystem } from "../../util/filesystem"
+import { Global } from "../../global"
+import path from "path"
 
 export const ModelsCommand = cmd({
   command: "models [provider]",
@@ -23,6 +26,10 @@ export const ModelsCommand = cmd({
       })
       .option("refresh", {
         describe: "refresh the models cache from models.dev",
+        type: "boolean",
+      })
+      .option("recent", {
+        describe: "list recently used models",
         type: "boolean",
       })
   },
@@ -48,6 +55,32 @@ export const ModelsCommand = cmd({
               process.stdout.write(EOL)
             }
           }
+        }
+
+        if (args.recent) {
+          const modelFile = await Filesystem.readJson<{
+            recent?: { providerID: ProviderID; modelID: string }[]
+          }>(path.join(Global.Path.state, "model.json")).catch(() => ({}))
+
+          const recents = modelFile.recent || []
+
+          for (const recent of recents) {
+            if (args.provider && recent.providerID !== args.provider) continue
+
+            const provider = providers[recent.providerID]
+            if (!provider) continue
+
+            const model = provider.models[recent.modelID]
+            if (!model) continue
+
+            process.stdout.write(`${recent.providerID}/${recent.modelID}`)
+            process.stdout.write(EOL)
+            if (args.verbose) {
+              process.stdout.write(JSON.stringify(model, null, 2))
+              process.stdout.write(EOL)
+            }
+          }
+          return
         }
 
         if (args.provider) {
