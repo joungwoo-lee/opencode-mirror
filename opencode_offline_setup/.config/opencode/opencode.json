@@ -1,0 +1,27 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "autoupdate": false,
+    "model": "AI-Center/openai/gpt-oss-120b",
+    "small_model": "AI-Center/openai/gpt-oss-120b",
+    "provider": {
+        "AI-Center": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "AI-Center",
+            "options": {
+                "baseURL": "http://apigw.samsungds.net:8000/gpt-oss/1/gpt-oss-120b/v1",
+                "headers": {
+                    "x-dep-ticket": "credential:TICKET-yours",
+                    "Send-System-Name": "Chain_Reaction",
+                    "User-Id": "joungwoo.lee",
+                    "User-Type": "AD_ID"
+                }
+            },
+            "models": {
+                "openai/gpt-oss-120b": {
+                    "name": "openai/gpt-oss-120b",
+                    "tool_call": true
+                }
+            }
+        }
+    }
+}
