@@ -1,0 +1,69 @@
+name: opencode-mirror-build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: opencode-mirror-build
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Make build script executable
+        run: chmod +x opencode_offline_setup/build_offline.sh
+
+      - name: Run offline build
+        run: ./opencode_offline_setup/build_offline.sh
+
+      - name: Prepare release metadata
+        id: meta
+        run: |
+          set -euo pipefail
+          BUILD_DATE="$(date -u +'%Y%m%d')"
+          BUILD_TS="$(date -u +'%Y%m%d-%H%M%S')"
+          ASSET_NAME="opencode.exe"
+          TAG_NAME="latest"
+          RELEASE_NAME="opencode mirror build ${BUILD_TS}"
+          echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
+          echo "asset_name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "release_name=${RELEASE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify release asset
+        run: |
+          set -euo pipefail
+          test -f "opencode_offline_setup/dist/${{ steps.meta.outputs.asset_name }}"
+
+      - name: Create GitHub release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag_name }}
+          name: ${{ steps.meta.outputs.release_name }}
+          generate_release_notes: true
+          overwrite_files: true
+          files: opencode_offline_setup/dist/${{ steps.meta.outputs.asset_name }}
