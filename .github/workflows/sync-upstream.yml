@@ -1,0 +1,84 @@
+name: Sync from upstream (opencode)
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # 매일 13:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-opencode
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout mirror
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          repository: joungwoo-lee/opencode-mirror
+
+      - name: Prepare preserved files
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/preserved/.github/workflows
+          
+          # 보존 대상 리스트 (opencode_offline_setup 폴더 및 커스텀 워크플로우들)
+          if [ -d opencode_offline_setup ]; then
+            cp -a opencode_offline_setup /tmp/preserved/
+          fi
+          cp -a .github/workflows/sync-upstream.yml /tmp/preserved/.github/workflows/
+          if [ -f .github/workflows/opencode-mirror-build.yml ]; then
+            cp -a .github/workflows/opencode-mirror-build.yml /tmp/preserved/.github/workflows/
+          fi
+
+      - name: Sync from anomalyco/opencode
+        run: |
+          set -euo pipefail
+          git remote add upstream https://github.com/anomalyco/opencode.git || true
+          git fetch upstream dev --prune
+          git checkout -B main upstream/dev
+
+      - name: Remove LFS candidate files
+        run: |
+          set -euo pipefail
+          # 용량이 큰 특정 미디어 파일 제거 (LFS 쿼터 절약)
+          rm -f packages/console/app/src/asset/lander/opencode-comparison-min.mp4
+          rm -f packages/console/app/src/asset/lander/opencode-min.mp4
+
+      - name: Restore preserved files
+        run: |
+          set -euo pipefail
+          
+          # 1. 워크플로우 폴더 정리 후 커스텀 워크플로우 복원
+          rm -rf .github/workflows
+          mkdir -p .github/workflows
+          cp -a /tmp/preserved/.github/workflows/sync-upstream.yml .github/workflows/
+          if [ -f /tmp/preserved/.github/workflows/opencode-mirror-build.yml ]; then
+            cp -a /tmp/preserved/.github/workflows/opencode-mirror-build.yml .github/workflows/
+          fi
+          
+          # 2. opencode_offline_setup 폴더 복원 (기존 것을 덮어쓰거나 새로 생성)
+          if [ -d /tmp/preserved/opencode_offline_setup ]; then
+            rm -rf opencode_offline_setup
+            cp -a /tmp/preserved/opencode_offline_setup ./
+          fi
+
+      - name: Commit and push when changed
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git add -A
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: sync from upstream and ensure opencode_offline_setup preservation"
+          git push --force-with-lease origin main
